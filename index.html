@@ -2,95 +2,109 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Profiles</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile Card with Rainbow Border & Snow</title>
 <style>
-body{
-    margin:0;
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #1e1e1e; /* dark background for contrast */
+    margin: 0;
     font-family: Arial, sans-serif;
-    background:url("https://static.vecteezy.com/system/resources/thumbnails/072/689/332/small/a-dark-forest-of-pine-trees-is-silhouetted-against-a-misty-gray-sky-creating-an-atmospheric-and-mysterious-landscape-scene-photo.jpg");
-    background-size:cover;
-    background-position:center;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+  }
 
-.container{
-    display:flex;
-    gap:40px;
-}
+  .profile-card {
+    position: relative;
+    width: 250px;
+    height: 350px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.85); /* clearer background */
+    border: 5px solid;
+    border-radius: 15px;
+    overflow: hidden;
+    text-align: center;
+    animation: rainbowBorder 20s linear infinite;
+  }
 
-.profile{
-    width:180px;
-    height:220px;
-    text-align:center;
-    padding:20px;
-    border-radius:20px;
-    position:relative;
-    background:rgba(0,0,0,0.6);
-}
+  .name {
+    text-transform: lowercase;
+    font-size: 24px;
+    margin-top: 50px;
+    color: #333;
+  }
 
-.profile::before{
-    content:"";
-    position:absolute;
-    inset:-3px;
-    border-radius:20px;
-    background:linear-gradient(
-        45deg,
-        red, orange, yellow, green, cyan, blue, violet, red
-    );
-    background-size:400%;
-    animation:rainbow 6s linear infinite;
-    z-index:-1;
-}
+  .info {
+    font-size: 16px;
+    color: #555;
+  }
 
-@keyframes rainbow{
-    0%{background-position:0%}
-    100%{background-position:400%}
-}
+  @keyframes rainbowBorder {
+    0% { border-image: linear-gradient(0deg, red, orange, yellow, green, blue, indigo, violet) 1; }
+    100% { border-image: linear-gradient(360deg, red, orange, yellow, green, blue, indigo, violet) 1; }
+  }
 
-.pfp{
-    width:100px;
-    height:100px;
-    border-radius:50%;
-    object-fit:cover;
-}
+  /* Snowflake container */
+  .snowflakes {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+  }
 
-.name{
-    color:white;
-    font-size:20px;
-    margin-top:15px;
-}
+  .snowflake {
+    position: absolute;
+    top: -10px;
+    color: white;
+    user-select: none;
+    pointer-events: none;
+    font-size: 1em;
+    opacity: 0.8;
+    animation-name: fall;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+
+  @keyframes fall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(360px) rotate(360deg); opacity: 0; }
+  }
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
-<div class="profile">
-<img class="pfp" src="https://cdn.discordapp.com/avatars/602243853571063838/a352019ca90d767b57c98a93bed74e54.webp?size=1024">
-<div class="name">Emre</div>
+<div class="profile-card">
+  <div class="snowflakes" id="snowflakes"></div>
+  <h2 class="name">leah</h2>
+  <p class="info">age: 15</p>
 </div>
 
-<div class="profile">
-<img class="pfp" src="https://cdn.discordapp.com/avatars/1420202850818064516/bafc5a1c05f4f615754c7a06cd906f4b.webp?size=1024">
-<div class="name">Charlie</div>
-</div>
+<script>
+  const snowContainer = document.getElementById('snowflakes');
+  const snowflakeCount = 20;
 
-<div class="profile">
-<img class="pfp" src="https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024">
-<div class="name">Ethan</div>
-</div>
-
-<div class="profile">
-<img class="pfp" src="https://cdn.discordapp.com/avatars/1412691167073538089/f79e8c7ac5ed47f64b4946677be6b548.webp?size=1024">
-<div class="name">Zes</div>
-</div>
-
-</div>
+  for (let i = 0; i < snowflakeCount; i++) {
+    const snowflake = document.createElement('div');
+    snowflake.classList.add('snowflake');
+    snowflake.textContent = '❄';
+    
+    // Random position and size
+    snowflake.style.left = Math.random() * 100 + '%';
+    snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
+    
+    // Random animation duration (fall speed)
+    snowflake.style.animationDuration = (Math.random() * 10 + 8) + 's';
+    
+    // Random delay for natural snowfall
+    snowflake.style.animationDelay = Math.random() * 10 + 's';
+    
+    snowContainer.appendChild(snowflake);
+  }
+</script>
 
 </body>
 </html>
