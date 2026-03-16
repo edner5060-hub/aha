@@ -8,7 +8,7 @@
 body{
     margin:0;
     font-family: Arial, sans-serif;
-    background:url("[static.vecteezy.com](https://static.vecteezy.com/system/resources/thumbnails/072/689/332/small/a-dark-forest-of-pine-trees-is-silhouetted-against-a-misty-gray-sky-creating-an-atmospheric-and-mysterious-landscape-scene-photo.jpg)");
+    background:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop'); /* Dark forest background */
     background-size:cover;
     background-position:center;
     height:100vh;
@@ -22,6 +22,9 @@ body{
 .container{
     display:flex;
     gap:40px;
+    flex-wrap:wrap;
+    justify-content:center;
+    padding:20px;
 }
 
 .profile{
@@ -32,27 +35,14 @@ body{
     border-radius:20px;
     position:relative;
     background:rgba(0,0,0,0.8);
-    border:3px solid transparent;
-    background-clip:padding-box;
+    border:3px solid rgba(255,255,255,0.2);
+    backdrop-filter:blur(5px);
+    transition:transform 0.3s ease;
 }
 
-.profile::before{
-    content:"";
-    position:absolute;
-    inset:-3px;
-    border-radius:20px;
-    background:linear-gradient(
-        45deg,
-        red, orange, yellow, green, cyan, blue, violet, red
-    );
-    background-size:400%;
-    animation:rainbow 6s linear infinite;
-    z-index:-1;
-}
-
-@keyframes rainbow{
-    0%{background-position:0%}
-    100%{background-position:400%}
+.profile:hover {
+    transform:scale(1.05);
+    border-color:rgba(255,255,255,0.4);
 }
 
 .pfp{
@@ -60,12 +50,15 @@ body{
     height:100px;
     border-radius:50%;
     object-fit:cover;
+    border:3px solid white;
 }
 
 .name{
     color:white;
     font-size:20px;
     margin-top:15px;
+    font-weight:bold;
+    text-shadow:2px 2px 4px rgba(0,0,0,0.5);
 }
 
 /* Snowfall */
@@ -76,6 +69,7 @@ body{
     pointer-events: none;
     animation: snowfall linear infinite;
     opacity: 0.8;
+    z-index:10;
 }
 
 @keyframes snowfall {
@@ -89,46 +83,9 @@ body{
     }
 }
 
-/* Music Player */
-.music-controls {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.7);
-    padding: 15px;
-    border-radius: 15px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-}
-
-.music-controls::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: 15px;
-    background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet, red);
-    background-size: 400%;
-    animation: rainbow 6s linear infinite;
-    z-index: -1;
-}
-
-.music-controls {
-    position: relative;
-}
-
-.play-btn, .pause-btn {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    color: white;
-    padding: 8px 15px;
-    border-radius: 20px;
-    cursor: pointer;
-    margin: 0 5px;
-    font-size: 14px;
-}
-
-.play-btn:hover, .pause-btn:hover {
-    background: rgba(255,255,255,0.4);
+/* Hidden audio element */
+#bgMusic {
+    display:none;
 }
 </style>
 </head>
@@ -137,34 +94,30 @@ body{
 <!-- Snowfall container -->
 <div id="snow-container"></div>
 
-<!-- Music Player -->
-<div class="music-controls">
-    <button class="play-btn" onclick="playMusic()">▶ Play</button>
-    <button class="pause-btn" onclick="pauseMusic()" style="display:none;">⏸ Pause</button>
-    <audio id="bgMusic" loop>
-        <source src="YOUR_MUSIC_FILE.mp3" type="audio/mpeg">
-        <!-- Replace YOUR_MUSIC_FILE.mp3 with your music file path -->
-    </audio>
-</div>
+<!-- Hidden Music Player (auto-plays) -->
+<audio id="bgMusic" loop autoplay>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+    <!-- Using a sample music URL that will work -->
+</audio>
 
 <div class="container">
 <div class="profile">
-<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/602243853571063838/a352019ca90d767b57c98a93bed74e54.webp?size=1024)">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/602243853571063838/a352019ca90d767b57c98a93bed74e54.webp?size=1024">
 <div class="name">Emre</div>
 </div>
 
 <div class="profile">
-<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/1420202850818064516/bafc5a1c05f4f615754c7a06cd906f4b.webp?size=1024)">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1420202850818064516/bafc5a1c05f4f615754c7a06cd906f4b.webp?size=1024">
 <div class="name">Charlie</div>
 </div>
 
 <div class="profile">
-<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024)">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024">
 <div class="name">Ethan</div>
 </div>
 
 <div class="profile">
-<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/1412691167073538089/f79e8c7ac5ed47f64b4946677be6b548.webp?size=1024)">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1412691167073538089/f79e8c7ac5ed47f64b4946677be6b548.webp?size=1024">
 <div class="name">Zes</div>
 </div>
 </div>
@@ -188,23 +141,20 @@ function createSnowflake() {
 
 setInterval(createSnowflake, 100);
 
-// Music controls
+// Ensure audio plays (some browsers block autoplay)
 const audio = document.getElementById('bgMusic');
-let isPlaying = false;
 
-function playMusic() {
-    audio.play();
-    document.querySelector('.play-btn').style.display = 'none';
-    document.querySelector('.pause-btn').style.display = 'inline-block';
-    isPlaying = true;
-}
-
-function pauseMusic() {
-    audio.pause();
-    document.querySelector('.play-btn').style.display = 'inline-block';
-    document.querySelector('.pause-btn').style.display = 'none';
-    isPlaying = false;
-}
+// Try to play audio when page loads
+window.addEventListener('load', function() {
+    audio.play().catch(function(error) {
+        console.log("Autoplay was prevented. Click anywhere to play music.");
+        // Create a one-time click handler to play audio
+        document.body.addEventListener('click', function playOnClick() {
+            audio.play();
+            document.body.removeEventListener('click', playOnClick);
+        }, { once: true });
+    });
+});
 </script>
 
 </body>
