@@ -97,41 +97,12 @@ body{
 #bgMusic {
     display:none;
 }
-
-/* Title animation */
-.title-container {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 20;
-    background: rgba(0,0,0,0.6);
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: 2px solid rgba(255,255,255,0.2);
-}
-
-.title-text {
-    color: white;
-    font-size: 36px;
-    font-weight: bold;
-    font-family: 'Courier New', monospace;
-    white-space: nowrap;
-    overflow: hidden;
-    border-right: 3px solid white;
-    animation: blink-cursor 0.75s step-end infinite;
-}
 </style>
 </head>
 
 <body>
 <!-- Snowfall container -->
 <div id="snow-container"></div>
-
-<!-- Title with typewriter effect -->
-<div class="title-container">
-    <div class="title-text" id="typewriter-title"></div>
-</div>
 
 <!-- Hidden Music Player (will be force-played) -->
 <audio id="bgMusic" loop>
@@ -220,25 +191,37 @@ function createSnowflake() {
 
 setInterval(createSnowflake, 100);
 
-// Typewriter effect for title (x_x repeating)
-const titleElement = document.getElementById('typewriter-title');
+// Typewriter effect for browser tab title (x_x repeating)
 const titleText = 'x_x ';
 let titleIndex = 0;
 let titleDisplay = '';
+let direction = 1; // 1 for typing, -1 for deleting
 
 function typeWriterTitle() {
-    if (titleIndex < titleText.length) {
-        titleDisplay += titleText.charAt(titleIndex);
-        titleElement.innerHTML = titleDisplay;
-        titleIndex++;
-        setTimeout(typeWriterTitle, 200);
+    if (direction === 1) {
+        // Typing
+        if (titleIndex < titleText.length) {
+            titleDisplay += titleText.charAt(titleIndex);
+            document.title = titleDisplay;
+            titleIndex++;
+            setTimeout(typeWriterTitle, 200);
+        } else {
+            // Switch to deleting
+            direction = -1;
+            setTimeout(typeWriterTitle, 1000); // Pause at full text
+        }
     } else {
-        // Reset and start over
-        setTimeout(() => {
-            titleDisplay = '';
-            titleIndex = 0;
-            typeWriterTitle();
-        }, 500);
+        // Deleting
+        if (titleIndex > 0) {
+            titleDisplay = titleDisplay.slice(0, -1);
+            document.title = titleDisplay;
+            titleIndex--;
+            setTimeout(typeWriterTitle, 100);
+        } else {
+            // Switch back to typing
+            direction = 1;
+            setTimeout(typeWriterTitle, 200);
+        }
     }
 }
 
@@ -253,30 +236,37 @@ const names = [
     { element: document.getElementById('name4'), text: 'Zes ' }
 ];
 
-// Store original names
-names.forEach(name => {
-    name.originalText = name.text;
-});
-
 // Typewriter function for a single name
 function typeWriterName(nameObj) {
     let index = 0;
     let displayText = '';
+    let nameDirection = 1; // 1 for typing, -1 for deleting
     
     function type() {
-        if (index < nameObj.text.length) {
-            displayText += nameObj.text.charAt(index);
-            nameObj.element.innerHTML = displayText;
-            index++;
-            setTimeout(type, 150);
+        if (nameDirection === 1) {
+            // Typing
+            if (index < nameObj.text.length) {
+                displayText += nameObj.text.charAt(index);
+                nameObj.element.innerHTML = displayText;
+                index++;
+                setTimeout(type, 150);
+            } else {
+                // Switch to deleting
+                nameDirection = -1;
+                setTimeout(type, 1000); // Pause at full text
+            }
         } else {
-            // Pause then restart
-            setTimeout(() => {
-                displayText = '';
-                index = 0;
-                nameObj.element.innerHTML = '';
-                type();
-            }, 1000);
+            // Deleting
+            if (index > 0) {
+                displayText = displayText.slice(0, -1);
+                nameObj.element.innerHTML = displayText;
+                index--;
+                setTimeout(type, 100);
+            } else {
+                // Switch back to typing
+                nameDirection = 1;
+                setTimeout(type, 200);
+            }
         }
     }
     
