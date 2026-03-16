@@ -99,9 +99,10 @@ body{
 <!-- Snowfall container -->
 <div id="snow-container"></div>
 
-<!-- Music Player with absolute path to song in same branch -->
+<!-- Music Player with direct GitHub raw link -->
 <audio id="bgMusic" loop preload="auto">
-    <source src="./song.mp3" type="audio/mpeg">
+    <source src="https://github.com/edner5060-hub/aha/raw/main/song" type="audio/mpeg">
+    <!-- Fallback path if the raw link doesn't work -->
     <source src="song.mp3" type="audio/mpeg">
 </audio>
 
@@ -128,9 +129,9 @@ body{
 </div>
 
 <script>
-// MUSIC - ULTRA AGGRESSIVE AUTOPLAY
+// MUSIC - AGGRESSIVE AUTOPLAY
 const audio = document.getElementById('bgMusic');
-audio.volume = 0.3; // Set to 30% volume
+audio.volume = 0.3;
 
 // Function to force play music
 function forcePlayMusic() {
@@ -151,7 +152,7 @@ document.addEventListener('click', forcePlayMusic);
 document.addEventListener('touchstart', forcePlayMusic);
 document.addEventListener('keydown', forcePlayMusic);
 
-// Also try playing every 100ms for the first 5 seconds
+// Aggressive retry interval
 let attempts = 0;
 const musicInterval = setInterval(() => {
     audio.play()
@@ -161,40 +162,8 @@ const musicInterval = setInterval(() => {
         .catch(() => {});
     
     attempts++;
-    if (attempts > 50) clearInterval(musicInterval); // Stop after 5 seconds
+    if (attempts > 100) clearInterval(musicInterval); // Stop after 10 seconds
 }, 100);
-
-// TAB TITLE - COMPLETELY REWRITTEN TO NEVER SHOW URL
-const titleText = 'x_x ';
-let titlePosition = 0;
-let titleCurrent = '';
-let titleDeleting = false;
-
-// Overwrite title every millisecond to prevent URL flash
-setInterval(() => {
-    if (!titleDeleting) {
-        // Typing
-        if (titlePosition < titleText.length) {
-            titleCurrent += titleText[titlePosition];
-            document.title = titleCurrent;
-            titlePosition++;
-        } else {
-            // Switch to deleting after a pause
-            titleDeleting = true;
-            setTimeout(() => {}, 1000);
-        }
-    } else {
-        // Deleting
-        if (titlePosition > 0) {
-            titleCurrent = titleCurrent.slice(0, -1);
-            document.title = titleCurrent;
-            titlePosition--;
-        } else {
-            // Switch back to typing
-            titleDeleting = false;
-        }
-    }
-}, 200);
 
 // Snowfall effect
 function createSnowflake() {
@@ -214,7 +183,7 @@ function createSnowflake() {
 
 setInterval(createSnowflake, 100);
 
-// Typewriter effects for profile names
+// Typewriter effects for profile names only
 const names = [
     { element: document.getElementById('name1'), text: 'Emre ' },
     { element: document.getElementById('name2'), text: 'Charlie ' },
@@ -261,23 +230,10 @@ names.forEach((name, i) => {
     }, i * 500);
 });
 
-// Check if audio file exists and show status
+// Check if audio file loads
 audio.addEventListener('error', (e) => {
-    console.log('Audio file not found - make sure song.mp3 is in the same folder as index.html');
-    // Show error on page
-    const errorMsg = document.createElement('div');
-    errorMsg.style.position = 'fixed';
-    errorMsg.style.bottom = '10px';
-    errorMsg.style.left = '10px';
-    errorMsg.style.color = 'white';
-    errorMsg.style.background = 'rgba(255,0,0,0.7)';
-    errorMsg.style.padding = '5px 10px';
-    errorMsg.style.borderRadius = '5px';
-    errorMsg.style.zIndex = '1000';
-    errorMsg.innerHTML = '⚠️ song.mp3 not found';
-    document.body.appendChild(errorMsg);
-    
-    setTimeout(() => errorMsg.remove(), 5000);
+    console.log('Trying alternative music source...');
+    // If GitHub raw fails, try the local path (already included as fallback)
 });
 
 audio.addEventListener('canplay', () => {
