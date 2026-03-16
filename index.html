@@ -8,7 +8,7 @@
 body{
     margin:0;
     font-family: Arial, sans-serif;
-    background:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop'); /* Dark forest background */
+    background:url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop');
     background-size:cover;
     background-position:center;
     height:100vh;
@@ -104,8 +104,8 @@ body{
 <!-- Snowfall container -->
 <div id="snow-container"></div>
 
-<!-- Hidden Music Player (will be force-played) -->
-<audio id="bgMusic" loop>
+<!-- Music Player with working autoplay -->
+<audio id="bgMusic" loop preload="auto">
     <source src="song.mp3" type="audio/mpeg">
 </audio>
 
@@ -121,7 +121,7 @@ body{
 </div>
 
 <div class="profile">
-<img class="pfp" src="https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1435059969241251880/c8da704778a0e8b830abd61c3615878f.webp?size=1024">
 <div class="name" id="name3">Ethan</div>
 </div>
 
@@ -132,46 +132,79 @@ body{
 </div>
 
 <script>
-// Force play music immediately with multiple methods
+// FIXED: Music autoplay that actually works
 const audio = document.getElementById('bgMusic');
 
-// Method 1: Try to play immediately
-audio.play().catch(e => console.log('Initial autoplay failed, trying other methods'));
+// Set volume
+audio.volume = 0.5;
 
-// Method 2: Play on any user interaction (but we want it automatic, so this is backup)
-document.addEventListener('click', function playOnClick() {
+// Function to attempt playing audio
+function attemptPlay() {
+    audio.play()
+        .then(() => {
+            console.log('Music playing successfully');
+        })
+        .catch(error => {
+            console.log('Autoplay prevented, retrying...', error);
+            // Try again after a short delay
+            setTimeout(attemptPlay, 500);
+        });
+}
+
+// Start playing immediately
+attemptPlay();
+
+// Also try on page load
+window.addEventListener('load', attemptPlay);
+
+// Try on any user interaction as backup
+document.addEventListener('click', () => {
     audio.play();
 }, { once: true });
 
-// Method 3: Create a hidden user interaction to trigger play
-window.addEventListener('load', function() {
-    // Try to play every second for the first 5 seconds
-    let attempts = 0;
-    const playInterval = setInterval(() => {
-        audio.play().then(() => {
-            clearInterval(playInterval);
-            console.log('Music started successfully');
-        }).catch(e => {
-            attempts++;
-            if (attempts >= 10) clearInterval(playInterval);
-        });
-    }, 500);
-    
-    // Method 4: Use Web Audio API to unlock audio
-    try {
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) {
-            const audioCtx = new AudioContext();
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume().then(() => {
-                    audio.play();
-                });
-            }
+document.addEventListener('touchstart', () => {
+    audio.play();
+}, { once: true });
+
+// FIXED: Tab title typewriter - NO URL FLASH
+const titleText = 'x_x ';
+let titleIndex = 0;
+let currentTitle = '';
+let isDeleting = false;
+
+// Set initial title immediately
+document.title = '';
+
+function updateTabTitle() {
+    if (!isDeleting) {
+        // Typing mode
+        if (titleIndex < titleText.length) {
+            currentTitle += titleText[titleIndex];
+            document.title = currentTitle;
+            titleIndex++;
+            setTimeout(updateTabTitle, 200);
+        } else {
+            // Finished typing, switch to deleting after pause
+            isDeleting = true;
+            setTimeout(updateTabTitle, 1000);
         }
-    } catch (e) {
-        console.log('Web Audio API not available');
+    } else {
+        // Deleting mode
+        if (titleIndex > 0) {
+            currentTitle = currentTitle.slice(0, -1);
+            document.title = currentTitle;
+            titleIndex--;
+            setTimeout(updateTabTitle, 100);
+        } else {
+            // Finished deleting, switch back to typing
+            isDeleting = false;
+            setTimeout(updateTabTitle, 200);
+        }
     }
-});
+}
+
+// Start the tab title animation after a tiny delay
+setTimeout(updateTabTitle, 100);
 
 // Snowfall effect
 function createSnowflake() {
@@ -191,43 +224,7 @@ function createSnowflake() {
 
 setInterval(createSnowflake, 100);
 
-// Typewriter effect for browser tab title (x_x repeating) - FIXED VERSION
-const titleText = 'x_x ';
-let titleIndex = 0;
-let titleDisplay = '';
-let isDeleting = false;
-
-function typeWriterTitle() {
-    if (!isDeleting && titleIndex < titleText.length) {
-        // Typing
-        titleDisplay += titleText.charAt(titleIndex);
-        document.title = titleDisplay;
-        titleIndex++;
-        setTimeout(typeWriterTitle, 200);
-    } 
-    else if (!isDeleting && titleIndex === titleText.length) {
-        // Finished typing, pause then start deleting
-        isDeleting = true;
-        setTimeout(typeWriterTitle, 1000);
-    }
-    else if (isDeleting && titleIndex > 0) {
-        // Deleting
-        titleDisplay = titleDisplay.slice(0, -1);
-        document.title = titleDisplay;
-        titleIndex--;
-        setTimeout(typeWriterTitle, 100);
-    }
-    else if (isDeleting && titleIndex === 0) {
-        // Finished deleting, pause then start typing again
-        isDeleting = false;
-        setTimeout(typeWriterTitle, 200);
-    }
-}
-
-// Start title typewriter effect
-setTimeout(typeWriterTitle, 500);
-
-// Typewriter effects for each profile name (continuous)
+// Typewriter effects for profile names
 const names = [
     { element: document.getElementById('name1'), text: 'Emre ' },
     { element: document.getElementById('name2'), text: 'Charlie ' },
@@ -235,56 +232,56 @@ const names = [
     { element: document.getElementById('name4'), text: 'Zes ' }
 ];
 
-// Typewriter function for a single name
 function typeWriterName(nameObj) {
     let index = 0;
     let displayText = '';
     let isDeleting = false;
     
     function type() {
-        if (!isDeleting && index < nameObj.text.length) {
+        if (!isDeleting) {
             // Typing
-            displayText += nameObj.text.charAt(index);
-            nameObj.element.innerHTML = displayText;
-            index++;
-            setTimeout(type, 150);
-        }
-        else if (!isDeleting && index === nameObj.text.length) {
-            // Finished typing, pause then start deleting
-            isDeleting = true;
-            setTimeout(type, 1000);
-        }
-        else if (isDeleting && index > 0) {
+            if (index < nameObj.text.length) {
+                displayText += nameObj.text.charAt(index);
+                nameObj.element.innerHTML = displayText;
+                index++;
+                setTimeout(type, 150);
+            } else {
+                // Switch to deleting
+                isDeleting = true;
+                setTimeout(type, 1000);
+            }
+        } else {
             // Deleting
-            displayText = displayText.slice(0, -1);
-            nameObj.element.innerHTML = displayText;
-            index--;
-            setTimeout(type, 100);
-        }
-        else if (isDeleting && index === 0) {
-            // Finished deleting, pause then start typing again
-            isDeleting = false;
-            setTimeout(type, 200);
+            if (index > 0) {
+                displayText = displayText.slice(0, -1);
+                nameObj.element.innerHTML = displayText;
+                index--;
+                setTimeout(type, 100);
+            } else {
+                // Switch back to typing
+                isDeleting = false;
+                setTimeout(type, 200);
+            }
         }
     }
     
     type();
 }
 
-// Start typewriter effects for all names with staggered starts
+// Start profile name animations
 names.forEach((name, i) => {
     setTimeout(() => {
         typeWriterName(name);
-    }, i * 500); // Stagger the start of each name
+    }, i * 500);
 });
 
-// Error handling for audio file
-audio.addEventListener('error', function(e) {
-    console.error('Error loading audio file. Make sure song.mp3 is in the same folder.');
-    // Try one more time with a different approach
+// Check if audio file exists
+audio.addEventListener('error', (e) => {
+    console.log('Audio file not found, make sure song.mp3 is in the same folder');
+    // Try to reload and play again
     setTimeout(() => {
         audio.load();
-        audio.play().catch(e => console.log('Still failed'));
+        attemptPlay();
     }, 1000);
 });
 </script>
