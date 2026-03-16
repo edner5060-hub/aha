@@ -92,11 +92,6 @@ body{
         opacity: 0;
     }
 }
-
-/* Hidden audio element */
-#bgMusic {
-    display:none;
-}
 </style>
 </head>
 
@@ -104,8 +99,9 @@ body{
 <!-- Snowfall container -->
 <div id="snow-container"></div>
 
-<!-- Music Player with working autoplay -->
+<!-- Music Player with absolute path to song in same branch -->
 <audio id="bgMusic" loop preload="auto">
+    <source src="./song.mp3" type="audio/mpeg">
     <source src="song.mp3" type="audio/mpeg">
 </audio>
 
@@ -132,79 +128,73 @@ body{
 </div>
 
 <script>
-// FIXED: Music autoplay that actually works
+// MUSIC - ULTRA AGGRESSIVE AUTOPLAY
 const audio = document.getElementById('bgMusic');
+audio.volume = 0.3; // Set to 30% volume
 
-// Set volume
-audio.volume = 0.5;
-
-// Function to attempt playing audio
-function attemptPlay() {
+// Function to force play music
+function forcePlayMusic() {
     audio.play()
         .then(() => {
-            console.log('Music playing successfully');
+            console.log('Music is playing!');
         })
-        .catch(error => {
-            console.log('Autoplay prevented, retrying...', error);
-            // Try again after a short delay
-            setTimeout(attemptPlay, 500);
+        .catch(() => {
+            console.log('Retrying music...');
+            setTimeout(forcePlayMusic, 100);
         });
 }
 
-// Start playing immediately
-attemptPlay();
+// Try every possible event
+forcePlayMusic();
+window.addEventListener('load', forcePlayMusic);
+document.addEventListener('click', forcePlayMusic);
+document.addEventListener('touchstart', forcePlayMusic);
+document.addEventListener('keydown', forcePlayMusic);
 
-// Also try on page load
-window.addEventListener('load', attemptPlay);
+// Also try playing every 100ms for the first 5 seconds
+let attempts = 0;
+const musicInterval = setInterval(() => {
+    audio.play()
+        .then(() => {
+            clearInterval(musicInterval);
+        })
+        .catch(() => {});
+    
+    attempts++;
+    if (attempts > 50) clearInterval(musicInterval); // Stop after 5 seconds
+}, 100);
 
-// Try on any user interaction as backup
-document.addEventListener('click', () => {
-    audio.play();
-}, { once: true });
-
-document.addEventListener('touchstart', () => {
-    audio.play();
-}, { once: true });
-
-// FIXED: Tab title typewriter - NO URL FLASH
+// TAB TITLE - COMPLETELY REWRITTEN TO NEVER SHOW URL
 const titleText = 'x_x ';
-let titleIndex = 0;
-let currentTitle = '';
-let isDeleting = false;
+let titlePosition = 0;
+let titleCurrent = '';
+let titleDeleting = false;
 
-// Set initial title immediately
-document.title = '';
-
-function updateTabTitle() {
-    if (!isDeleting) {
-        // Typing mode
-        if (titleIndex < titleText.length) {
-            currentTitle += titleText[titleIndex];
-            document.title = currentTitle;
-            titleIndex++;
-            setTimeout(updateTabTitle, 200);
+// Overwrite title every millisecond to prevent URL flash
+setInterval(() => {
+    if (!titleDeleting) {
+        // Typing
+        if (titlePosition < titleText.length) {
+            titleCurrent += titleText[titlePosition];
+            document.title = titleCurrent;
+            titlePosition++;
         } else {
-            // Finished typing, switch to deleting after pause
-            isDeleting = true;
-            setTimeout(updateTabTitle, 1000);
+            // Switch to deleting after a pause
+            titleDeleting = true;
+            setTimeout(() => {}, 1000);
         }
     } else {
-        // Deleting mode
-        if (titleIndex > 0) {
-            currentTitle = currentTitle.slice(0, -1);
-            document.title = currentTitle;
-            titleIndex--;
-            setTimeout(updateTabTitle, 100);
+        // Deleting
+        if (titlePosition > 0) {
+            titleCurrent = titleCurrent.slice(0, -1);
+            document.title = titleCurrent;
+            titlePosition--;
         } else {
-            // Finished deleting, switch back to typing
-            isDeleting = false;
-            setTimeout(updateTabTitle, 200);
+            // Switch back to typing
+            titleDeleting = false;
         }
     }
-}
-
-// Start the tab title animation after a tiny delay
-setTimeout(updateTabTitle, 100);
+}, 200);
 
 // Snowfall effect
 function createSnowflake() {
@@ -239,26 +229,22 @@ function typeWriterName(nameObj) {
     
     function type() {
         if (!isDeleting) {
-            // Typing
             if (index < nameObj.text.length) {
                 displayText += nameObj.text.charAt(index);
                 nameObj.element.innerHTML = displayText;
                 index++;
                 setTimeout(type, 150);
             } else {
-                // Switch to deleting
                 isDeleting = true;
                 setTimeout(type, 1000);
             }
         } else {
-            // Deleting
             if (index > 0) {
                 displayText = displayText.slice(0, -1);
                 nameObj.element.innerHTML = displayText;
                 index--;
                 setTimeout(type, 100);
             } else {
-                // Switch back to typing
                 isDeleting = false;
                 setTimeout(type, 200);
             }
@@ -275,14 +261,27 @@ names.forEach((name, i) => {
     }, i * 500);
 });
 
-// Check if audio file exists
+// Check if audio file exists and show status
 audio.addEventListener('error', (e) => {
-    console.log('Audio file not found, make sure song.mp3 is in the same folder');
-    // Try to reload and play again
-    setTimeout(() => {
-        audio.load();
-        attemptPlay();
-    }, 1000);
+    console.log('Audio file not found - make sure song.mp3 is in the same folder as index.html');
+    // Show error on page
+    const errorMsg = document.createElement('div');
+    errorMsg.style.position = 'fixed';
+    errorMsg.style.bottom = '10px';
+    errorMsg.style.left = '10px';
+    errorMsg.style.color = 'white';
+    errorMsg.style.background = 'rgba(255,0,0,0.7)';
+    errorMsg.style.padding = '5px 10px';
+    errorMsg.style.borderRadius = '5px';
+    errorMsg.style.zIndex = '1000';
+    errorMsg.innerHTML = '⚠️ song.mp3 not found';
+    document.body.appendChild(errorMsg);
+    
+    setTimeout(() => errorMsg.remove(), 5000);
+});
+
+audio.addEventListener('canplay', () => {
+    console.log('Audio file loaded successfully');
 });
 </script>
 
