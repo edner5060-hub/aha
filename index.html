@@ -191,37 +191,36 @@ function createSnowflake() {
 
 setInterval(createSnowflake, 100);
 
-// Typewriter effect for browser tab title (x_x repeating)
+// Typewriter effect for browser tab title (x_x repeating) - FIXED VERSION
 const titleText = 'x_x ';
 let titleIndex = 0;
 let titleDisplay = '';
-let direction = 1; // 1 for typing, -1 for deleting
+let isDeleting = false;
 
 function typeWriterTitle() {
-    if (direction === 1) {
+    if (!isDeleting && titleIndex < titleText.length) {
         // Typing
-        if (titleIndex < titleText.length) {
-            titleDisplay += titleText.charAt(titleIndex);
-            document.title = titleDisplay;
-            titleIndex++;
-            setTimeout(typeWriterTitle, 200);
-        } else {
-            // Switch to deleting
-            direction = -1;
-            setTimeout(typeWriterTitle, 1000); // Pause at full text
-        }
-    } else {
+        titleDisplay += titleText.charAt(titleIndex);
+        document.title = titleDisplay;
+        titleIndex++;
+        setTimeout(typeWriterTitle, 200);
+    } 
+    else if (!isDeleting && titleIndex === titleText.length) {
+        // Finished typing, pause then start deleting
+        isDeleting = true;
+        setTimeout(typeWriterTitle, 1000);
+    }
+    else if (isDeleting && titleIndex > 0) {
         // Deleting
-        if (titleIndex > 0) {
-            titleDisplay = titleDisplay.slice(0, -1);
-            document.title = titleDisplay;
-            titleIndex--;
-            setTimeout(typeWriterTitle, 100);
-        } else {
-            // Switch back to typing
-            direction = 1;
-            setTimeout(typeWriterTitle, 200);
-        }
+        titleDisplay = titleDisplay.slice(0, -1);
+        document.title = titleDisplay;
+        titleIndex--;
+        setTimeout(typeWriterTitle, 100);
+    }
+    else if (isDeleting && titleIndex === 0) {
+        // Finished deleting, pause then start typing again
+        isDeleting = false;
+        setTimeout(typeWriterTitle, 200);
     }
 }
 
@@ -240,33 +239,32 @@ const names = [
 function typeWriterName(nameObj) {
     let index = 0;
     let displayText = '';
-    let nameDirection = 1; // 1 for typing, -1 for deleting
+    let isDeleting = false;
     
     function type() {
-        if (nameDirection === 1) {
+        if (!isDeleting && index < nameObj.text.length) {
             // Typing
-            if (index < nameObj.text.length) {
-                displayText += nameObj.text.charAt(index);
-                nameObj.element.innerHTML = displayText;
-                index++;
-                setTimeout(type, 150);
-            } else {
-                // Switch to deleting
-                nameDirection = -1;
-                setTimeout(type, 1000); // Pause at full text
-            }
-        } else {
+            displayText += nameObj.text.charAt(index);
+            nameObj.element.innerHTML = displayText;
+            index++;
+            setTimeout(type, 150);
+        }
+        else if (!isDeleting && index === nameObj.text.length) {
+            // Finished typing, pause then start deleting
+            isDeleting = true;
+            setTimeout(type, 1000);
+        }
+        else if (isDeleting && index > 0) {
             // Deleting
-            if (index > 0) {
-                displayText = displayText.slice(0, -1);
-                nameObj.element.innerHTML = displayText;
-                index--;
-                setTimeout(type, 100);
-            } else {
-                // Switch back to typing
-                nameDirection = 1;
-                setTimeout(type, 200);
-            }
+            displayText = displayText.slice(0, -1);
+            nameObj.element.innerHTML = displayText;
+            index--;
+            setTimeout(type, 100);
+        }
+        else if (isDeleting && index === 0) {
+            // Finished deleting, pause then start typing again
+            isDeleting = false;
+            setTimeout(type, 200);
         }
     }
     
