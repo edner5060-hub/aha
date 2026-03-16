@@ -59,6 +59,16 @@ body{
     margin-top:15px;
     font-weight:bold;
     text-shadow:2px 2px 4px rgba(0,0,0,0.5);
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 2px solid white;
+    animation: blink-cursor 0.75s step-end infinite;
+}
+
+@keyframes blink-cursor {
+    from, to { border-color: transparent; }
+    50% { border-color: white; }
 }
 
 /* Snowfall */
@@ -87,6 +97,30 @@ body{
 #bgMusic {
     display:none;
 }
+
+/* Title animation */
+.title-container {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    background: rgba(0,0,0,0.6);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 2px solid rgba(255,255,255,0.2);
+}
+
+.title-text {
+    color: white;
+    font-size: 36px;
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+    overflow: hidden;
+    border-right: 3px solid white;
+    animation: blink-cursor 0.75s step-end infinite;
+}
 </style>
 </head>
 
@@ -94,35 +128,80 @@ body{
 <!-- Snowfall container -->
 <div id="snow-container"></div>
 
-<!-- Hidden Music Player (auto-plays) -->
-<audio id="bgMusic" loop autoplay>
-    <source src="aha/song.mp3" type="audio/mpeg">
-    <!-- This will look for song.mp3 in the same directory as this HTML file -->
+<!-- Title with typewriter effect -->
+<div class="title-container">
+    <div class="title-text" id="typewriter-title"></div>
+</div>
+
+<!-- Hidden Music Player (will be force-played) -->
+<audio id="bgMusic" loop>
+    <source src="song.mp3" type="audio/mpeg">
 </audio>
 
 <div class="container">
 <div class="profile">
 <img class="pfp" src="https://cdn.discordapp.com/avatars/602243853571063838/a352019ca90d767b57c98a93bed74e54.webp?size=1024">
-<div class="name">Emre</div>
+<div class="name" id="name1">Emre</div>
 </div>
 
 <div class="profile">
 <img class="pfp" src="https://cdn.discordapp.com/avatars/1420202850818064516/bafc5a1c05f4f615754c7a06cd906f4b.webp?size=1024">
-<div class="name">Charlie</div>
+<div class="name" id="name2">Charlie</div>
 </div>
 
 <div class="profile">
 <img class="pfp" src="https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024">
-<div class="name">Ethan</div>
+<div class="name" id="name3">Ethan</div>
 </div>
 
 <div class="profile">
 <img class="pfp" src="https://cdn.discordapp.com/avatars/1412691167073538089/f79e8c7ac5ed47f64b4946677be6b548.webp?size=1024">
-<div class="name">Zes</div>
+<div class="name" id="name4">Zes</div>
 </div>
 </div>
 
 <script>
+// Force play music immediately with multiple methods
+const audio = document.getElementById('bgMusic');
+
+// Method 1: Try to play immediately
+audio.play().catch(e => console.log('Initial autoplay failed, trying other methods'));
+
+// Method 2: Play on any user interaction (but we want it automatic, so this is backup)
+document.addEventListener('click', function playOnClick() {
+    audio.play();
+}, { once: true });
+
+// Method 3: Create a hidden user interaction to trigger play
+window.addEventListener('load', function() {
+    // Try to play every second for the first 5 seconds
+    let attempts = 0;
+    const playInterval = setInterval(() => {
+        audio.play().then(() => {
+            clearInterval(playInterval);
+            console.log('Music started successfully');
+        }).catch(e => {
+            attempts++;
+            if (attempts >= 10) clearInterval(playInterval);
+        });
+    }, 500);
+    
+    // Method 4: Use Web Audio API to unlock audio
+    try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+            const audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume().then(() => {
+                    audio.play();
+                });
+            }
+        }
+    } catch (e) {
+        console.log('Web Audio API not available');
+    }
+});
+
 // Snowfall effect
 function createSnowflake() {
     const snowflake = document.createElement('div');
@@ -141,62 +220,84 @@ function createSnowflake() {
 
 setInterval(createSnowflake, 100);
 
-// Ensure audio plays (some browsers block autoplay)
-const audio = document.getElementById('bgMusic');
+// Typewriter effect for title (x_x repeating)
+const titleElement = document.getElementById('typewriter-title');
+const titleText = 'x_x ';
+let titleIndex = 0;
+let titleDisplay = '';
 
-// Try to play audio when page loads
-window.addEventListener('load', function() {
-    // First, check if the audio file exists and can be played
-    audio.addEventListener('error', function(e) {
-        console.error('Error loading audio file. Make sure song.mp3 is in the same folder as this HTML file.');
-        // Create a visible message on the page
-        const errorMsg = document.createElement('div');
-        errorMsg.style.position = 'fixed';
-        errorMsg.style.bottom = '20px';
-        errorMsg.style.left = '20px';
-        errorMsg.style.background = 'rgba(255,0,0,0.7)';
-        errorMsg.style.color = 'white';
-        errorMsg.style.padding = '10px';
-        errorMsg.style.borderRadius = '5px';
-        errorMsg.style.zIndex = '1000';
-        errorMsg.innerHTML = '⚠️ Could not load song.mp3. Make sure it\'s in the same folder as this HTML file.';
-        document.body.appendChild(errorMsg);
-        
-        // Remove the message after 5 seconds
+function typeWriterTitle() {
+    if (titleIndex < titleText.length) {
+        titleDisplay += titleText.charAt(titleIndex);
+        titleElement.innerHTML = titleDisplay;
+        titleIndex++;
+        setTimeout(typeWriterTitle, 200);
+    } else {
+        // Reset and start over
         setTimeout(() => {
-            errorMsg.remove();
-        }, 5000);
-    });
+            titleDisplay = '';
+            titleIndex = 0;
+            typeWriterTitle();
+        }, 500);
+    }
+}
+
+// Start title typewriter effect
+setTimeout(typeWriterTitle, 500);
+
+// Typewriter effects for each profile name (continuous)
+const names = [
+    { element: document.getElementById('name1'), text: 'Emre ' },
+    { element: document.getElementById('name2'), text: 'Charlie ' },
+    { element: document.getElementById('name3'), text: 'Ethan ' },
+    { element: document.getElementById('name4'), text: 'Zes ' }
+];
+
+// Store original names
+names.forEach(name => {
+    name.originalText = name.text;
+});
+
+// Typewriter function for a single name
+function typeWriterName(nameObj) {
+    let index = 0;
+    let displayText = '';
     
-    audio.play().catch(function(error) {
-        console.log("Autoplay was prevented. Click anywhere to play music.");
-        // Create a one-time click handler to play audio
-        document.body.addEventListener('click', function playOnClick() {
-            audio.play().catch(e => console.log('Still couldn\'t play audio:', e));
-            document.body.removeEventListener('click', playOnClick);
-        }, { once: true });
-        
-        // Show a subtle hint to click
-        const hintMsg = document.createElement('div');
-        hintMsg.style.position = 'fixed';
-        hintMsg.style.bottom = '20px';
-        hintMsg.style.right = '20px';
-        hintMsg.style.background = 'rgba(0,0,0,0.7)';
-        hintMsg.style.color = 'white';
-        hintMsg.style.padding = '10px';
-        hintMsg.style.borderRadius = '5px';
-        hintMsg.style.zIndex = '1000';
-        hintMsg.style.border = '1px solid white';
-        hintMsg.innerHTML = '🔊 Click anywhere to play music';
-        document.body.appendChild(hintMsg);
-        
-        // Remove the hint after 5 seconds
-        setTimeout(() => {
-            hintMsg.style.opacity = '0';
-            hintMsg.style.transition = 'opacity 1s';
-            setTimeout(() => hintMsg.remove(), 1000);
-        }, 5000);
-    });
+    function type() {
+        if (index < nameObj.text.length) {
+            displayText += nameObj.text.charAt(index);
+            nameObj.element.innerHTML = displayText;
+            index++;
+            setTimeout(type, 150);
+        } else {
+            // Pause then restart
+            setTimeout(() => {
+                displayText = '';
+                index = 0;
+                nameObj.element.innerHTML = '';
+                type();
+            }, 1000);
+        }
+    }
+    
+    type();
+}
+
+// Start typewriter effects for all names with staggered starts
+names.forEach((name, i) => {
+    setTimeout(() => {
+        typeWriterName(name);
+    }, i * 500); // Stagger the start of each name
+});
+
+// Error handling for audio file
+audio.addEventListener('error', function(e) {
+    console.error('Error loading audio file. Make sure song.mp3 is in the same folder.');
+    // Try one more time with a different approach
+    setTimeout(() => {
+        audio.load();
+        audio.play().catch(e => console.log('Still failed'));
+    }, 1000);
 });
 </script>
 
