@@ -96,8 +96,8 @@ body{
 
 <!-- Hidden Music Player (auto-plays) -->
 <audio id="bgMusic" loop autoplay>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
-    <!-- Using a sample music URL that will work -->
+    <source src="song.mp3" type="audio/mpeg">
+    <!-- This will look for song.mp3 in the same directory as this HTML file -->
 </audio>
 
 <div class="container">
@@ -146,13 +146,56 @@ const audio = document.getElementById('bgMusic');
 
 // Try to play audio when page loads
 window.addEventListener('load', function() {
+    // First, check if the audio file exists and can be played
+    audio.addEventListener('error', function(e) {
+        console.error('Error loading audio file. Make sure song.mp3 is in the same folder as this HTML file.');
+        // Create a visible message on the page
+        const errorMsg = document.createElement('div');
+        errorMsg.style.position = 'fixed';
+        errorMsg.style.bottom = '20px';
+        errorMsg.style.left = '20px';
+        errorMsg.style.background = 'rgba(255,0,0,0.7)';
+        errorMsg.style.color = 'white';
+        errorMsg.style.padding = '10px';
+        errorMsg.style.borderRadius = '5px';
+        errorMsg.style.zIndex = '1000';
+        errorMsg.innerHTML = '⚠️ Could not load song.mp3. Make sure it\'s in the same folder as this HTML file.';
+        document.body.appendChild(errorMsg);
+        
+        // Remove the message after 5 seconds
+        setTimeout(() => {
+            errorMsg.remove();
+        }, 5000);
+    });
+    
     audio.play().catch(function(error) {
         console.log("Autoplay was prevented. Click anywhere to play music.");
         // Create a one-time click handler to play audio
         document.body.addEventListener('click', function playOnClick() {
-            audio.play();
+            audio.play().catch(e => console.log('Still couldn\'t play audio:', e));
             document.body.removeEventListener('click', playOnClick);
         }, { once: true });
+        
+        // Show a subtle hint to click
+        const hintMsg = document.createElement('div');
+        hintMsg.style.position = 'fixed';
+        hintMsg.style.bottom = '20px';
+        hintMsg.style.right = '20px';
+        hintMsg.style.background = 'rgba(0,0,0,0.7)';
+        hintMsg.style.color = 'white';
+        hintMsg.style.padding = '10px';
+        hintMsg.style.borderRadius = '5px';
+        hintMsg.style.zIndex = '1000';
+        hintMsg.style.border = '1px solid white';
+        hintMsg.innerHTML = '🔊 Click anywhere to play music';
+        document.body.appendChild(hintMsg);
+        
+        // Remove the hint after 5 seconds
+        setTimeout(() => {
+            hintMsg.style.opacity = '0';
+            hintMsg.style.transition = 'opacity 1s';
+            setTimeout(() => hintMsg.remove(), 1000);
+        }, 5000);
     });
 });
 </script>
