@@ -2,108 +2,209 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profile Card with Rainbow Border & Snow</title>
+<title>Profiles</title>
+
 <style>
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: #1e1e1e; /* dark background for contrast */
-    margin: 0;
+body{
+    margin:0;
     font-family: Arial, sans-serif;
-  }
+    background:url("[static.vecteezy.com](https://static.vecteezy.com/system/resources/thumbnails/072/689/332/small/a-dark-forest-of-pine-trees-is-silhouetted-against-a-misty-gray-sky-creating-an-atmospheric-and-mysterious-landscape-scene-photo.jpg)");
+    background-size:cover;
+    background-position:center;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    overflow:hidden;
+}
 
-  .profile-card {
-    position: relative;
-    width: 250px;
-    height: 350px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.85); /* clearer background */
-    border: 5px solid;
-    border-radius: 15px;
-    overflow: hidden;
-    text-align: center;
-    animation: rainbowBorder 20s linear infinite;
-  }
+.container{
+    display:flex;
+    gap:40px;
+}
 
-  .name {
-    text-transform: lowercase;
-    font-size: 24px;
-    margin-top: 50px;
-    color: #333;
-  }
+.profile{
+    width:180px;
+    height:220px;
+    text-align:center;
+    padding:20px;
+    border-radius:20px;
+    position:relative;
+    background:rgba(0,0,0,0.8);
+    border:3px solid transparent;
+    background-clip:padding-box;
+}
 
-  .info {
-    font-size: 16px;
-    color: #555;
-  }
+.profile::before{
+    content:"";
+    position:absolute;
+    inset:-3px;
+    border-radius:20px;
+    background:linear-gradient(
+        45deg,
+        red, orange, yellow, green, cyan, blue, violet, red
+    );
+    background-size:400%;
+    animation:rainbow 6s linear infinite;
+    z-index:-1;
+}
 
-  @keyframes rainbowBorder {
-    0% { border-image: linear-gradient(0deg, red, orange, yellow, green, blue, indigo, violet) 1; }
-    100% { border-image: linear-gradient(360deg, red, orange, yellow, green, blue, indigo, violet) 1; }
-  }
+@keyframes rainbow{
+    0%{background-position:0%}
+    100%{background-position:400%}
+}
 
-  /* Snowflake container */
-  .snowflakes {
+.pfp{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.name{
+    color:white;
+    font-size:20px;
+    margin-top:15px;
+}
+
+/* Snowfall */
+.snowflake {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    overflow: hidden;
-  }
-
-  .snowflake {
-    position: absolute;
-    top: -10px;
     color: white;
-    user-select: none;
+    font-size: 1px;
     pointer-events: none;
-    font-size: 1em;
+    animation: snowfall linear infinite;
     opacity: 0.8;
-    animation-name: fall;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
+}
 
-  @keyframes fall {
-    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(360px) rotate(360deg); opacity: 0; }
-  }
+@keyframes snowfall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Music Player */
+.music-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    padding: 15px;
+    border-radius: 15px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.music-controls::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 15px;
+    background: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet, red);
+    background-size: 400%;
+    animation: rainbow 6s linear infinite;
+    z-index: -1;
+}
+
+.music-controls {
+    position: relative;
+}
+
+.play-btn, .pause-btn {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    margin: 0 5px;
+    font-size: 14px;
+}
+
+.play-btn:hover, .pause-btn:hover {
+    background: rgba(255,255,255,0.4);
+}
 </style>
 </head>
-<body>
 
-<div class="profile-card">
-  <div class="snowflakes" id="snowflakes"></div>
-  <h2 class="name">leah</h2>
-  <p class="info">age: 15</p>
+<body>
+<!-- Snowfall container -->
+<div id="snow-container"></div>
+
+<!-- Music Player -->
+<div class="music-controls">
+    <button class="play-btn" onclick="playMusic()">▶ Play</button>
+    <button class="pause-btn" onclick="pauseMusic()" style="display:none;">⏸ Pause</button>
+    <audio id="bgMusic" loop>
+        <source src="YOUR_MUSIC_FILE.mp3" type="audio/mpeg">
+        <!-- Replace YOUR_MUSIC_FILE.mp3 with your music file path -->
+    </audio>
+</div>
+
+<div class="container">
+<div class="profile">
+<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/602243853571063838/a352019ca90d767b57c98a93bed74e54.webp?size=1024)">
+<div class="name">Emre</div>
+</div>
+
+<div class="profile">
+<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/1420202850818064516/bafc5a1c05f4f615754c7a06cd906f4b.webp?size=1024)">
+<div class="name">Charlie</div>
+</div>
+
+<div class="profile">
+<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024)">
+<div class="name">Ethan</div>
+</div>
+
+<div class="profile">
+<img class="pfp" src="[cdn.discordapp.com](https://cdn.discordapp.com/avatars/1412691167073538089/f79e8c7ac5ed47f64b4946677be6b548.webp?size=1024)">
+<div class="name">Zes</div>
+</div>
 </div>
 
 <script>
-  const snowContainer = document.getElementById('snowflakes');
-  const snowflakeCount = 20;
-
-  for (let i = 0; i < snowflakeCount; i++) {
+// Snowfall effect
+function createSnowflake() {
     const snowflake = document.createElement('div');
-    snowflake.classList.add('snowflake');
-    snowflake.textContent = '❄';
+    snowflake.className = 'snowflake';
+    snowflake.innerHTML = '❄';
+    snowflake.style.left = Math.random() * 100 + 'vw';
+    snowflake.style.animationDuration = (Math.random() * 3 + 2) + 's';
+    snowflake.style.opacity = Math.random() * 0.5 + 0.3;
+    snowflake.style.fontSize = (Math.random() * 5 + 5) + 'px';
+    document.getElementById('snow-container').appendChild(snowflake);
     
-    // Random position and size
-    snowflake.style.left = Math.random() * 100 + '%';
-    snowflake.style.fontSize = (Math.random() * 10 + 10) + 'px';
-    
-    // Random animation duration (fall speed)
-    snowflake.style.animationDuration = (Math.random() * 10 + 8) + 's';
-    
-    // Random delay for natural snowfall
-    snowflake.style.animationDelay = Math.random() * 10 + 's';
-    
-    snowContainer.appendChild(snowflake);
-  }
+    setTimeout(() => {
+        snowflake.remove();
+    }, 5000);
+}
+
+setInterval(createSnowflake, 100);
+
+// Music controls
+const audio = document.getElementById('bgMusic');
+let isPlaying = false;
+
+function playMusic() {
+    audio.play();
+    document.querySelector('.play-btn').style.display = 'none';
+    document.querySelector('.pause-btn').style.display = 'inline-block';
+    isPlaying = true;
+}
+
+function pauseMusic() {
+    audio.pause();
+    document.querySelector('.play-btn').style.display = 'inline-block';
+    document.querySelector('.pause-btn').style.display = 'none';
+    isPlaying = false;
+}
 </script>
 
 </body>
