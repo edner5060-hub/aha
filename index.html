@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Profiles</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:url("https://static.vecteezy.com/system/resources/thumbnails/072/689/332/small/a-dark-forest-of-pine-trees-is-silhouetted-against-a-misty-gray-sky-creating-an-atmospheric-and-mysterious-landscape-scene-photo.jpg");
+    background-size:cover;
+    background-position:center;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    display:flex;
+    gap:40px;
+}
+
+.profile{
+    width:180px;
+    height:220px;
+    text-align:center;
+    padding:20px;
+    border-radius:20px;
+    position:relative;
+    background:rgba(0,0,0,0.6);
+}
+
+.profile::before{
+    content:"";
+    position:absolute;
+    inset:-3px;
+    border-radius:20px;
+    background:linear-gradient(
+        45deg,
+        red, orange, yellow, green, cyan, blue, violet, red
+    );
+    background-size:400%;
+    animation:rainbow 6s linear infinite;
+    z-index:-1;
+}
+
+@keyframes rainbow{
+    0%{background-position:0%}
+    100%{background-position:400%}
+}
+
+.pfp{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+.name{
+    color:white;
+    font-size:20px;
+    margin-top:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="profile">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/602243853571063838/a352019ca90d767b57c98a93bed74e54.webp?size=1024">
+<div class="name">Emre</div>
+</div>
+
+<div class="profile">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1420202850818064516/bafc5a1c05f4f615754c7a06cd906f4b.webp?size=1024">
+<div class="name">Charlie</div>
+</div>
+
+<div class="profile">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1435059969241251880/e64ea35632e04fd2b2033d3da7f1ccce.webp?size=1024">
+<div class="name">Ethan</div>
+</div>
+
+<div class="profile">
+<img class="pfp" src="https://cdn.discordapp.com/avatars/1412691167073538089/f79e8c7ac5ed47f64b4946677be6b548.webp?size=1024">
+<div class="name">Zes</div>
+</div>
+
+</div>
+
+</body>
+</html>
